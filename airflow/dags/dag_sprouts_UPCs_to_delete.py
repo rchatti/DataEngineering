@@ -30,7 +30,7 @@ t1 = GoogleCloudStorageObjectSensor(
     task_id = 'sensor_task',
     bucket = 'spins-tmp-ext/home/rchatti',
     object = 'sprouts_list_of_upcs.csv',
-    google_cloud_conn_id = 'bigquery_default',
+    google_cloud_conn_id = 'google_cloud_storage_default',
     dag = dag
 )
 
@@ -108,6 +108,7 @@ t3 = BigQueryOperator(
     bigquery_conn_id='bigquery_default',
     destination_dataset_table = "{0}.{1}.{2}".format(project, dest_dataset, dest_table),
     create_disposition='CREATE_IF_NEEDED',
+    write_disposition = 'WRITE_TRUNCATE',
     use_legacy_sql=False,
     dag = dag
 )
@@ -127,11 +128,11 @@ t4 = BigQueryToCloudStorageOperator(
 )
 
 #T5: Clean up UPC CSV
-t5 = BashOperator(
-    task_id = 'Delete_Processed_UPC_List',
-    bash_command = 'gsutil rm gs://spins-tmp-ext/home/rchatti/sprouts_list_of_upcs.csv',
-    dag = dag
-)
+# t5 = BashOperator(
+#     task_id = 'Delete_Processed_UPC_List',
+#     bash_command = 'gsutil rm gs://spins-tmp-ext/home/rchatti/sprouts_list_of_upcs.csv',
+#     dag = dag
+# )
 
 ## Dependencies
-t1 >> t2 >> t3 >> t4 >> t5
+t2 >> t3 >> t4
