@@ -1,20 +1,17 @@
-import apache_beam as beam 
-
-class MultiplyByTen(beam.DoFn):
-    def process(self, element):
-        return [element ** 10]
+import apache_beam as beam
+from apache_beam.transforms.core import ParDo
 
 output = []
-def collect(row):
-    output.append(row)
-    return True
+def collect(numbers):
+    output.append(numbers)
+
+def multBy10fn(in_element):
+    yield in_element * 10
 
 with beam.Pipeline() as P:
-    (
-        P 
-        | "Create" >> beam.Create([1,2,3,4,5])
-        | "ParDo Function" >> beam.ParDo(MultiplyByTen())
-        | "Print" >> beam.Map(collect)
-    )
+    (P   | 'Create' >> beam.Create([1,2,3,4,5])
+        | 'Multiply' >> beam.ParDo(multBy10fn)
+        | 'Collect' >> beam.Map(collect)
+        )
 
 print(output)
