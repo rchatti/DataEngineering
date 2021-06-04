@@ -1,12 +1,14 @@
 import apache_beam as beam
 
 output = []
-def collect(row):
-    output.append(row)
-    
+def collect(response):
+    yield output.append(response)
+
 with beam.Pipeline() as P:
-    numbers = P | beam.Create([1,2,3,4,5])
-    squares = numbers | beam.Map(lambda x: x ** x)
-    squares | beam.Map(collect)
+    (
+        P   |   beam.Create([1,2,3,4,5])
+            |   beam.Map(lambda x: x * 5)
+            |   beam.Map(collect)
+    )
 
 print(output)
